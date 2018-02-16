@@ -1,7 +1,8 @@
 module TestQueue
   class Reporter
-    def initialize(completed:)
+    def initialize(completed:, duration:)
       @completed = completed
+      @duration = duration
       @failures = ''
 
       @stats = Stats.new(stats_file)
@@ -9,7 +10,7 @@ module TestQueue
 
     def summarize
       puts
-      puts "==> Summary (#{@completed.size} workers in %.4fs)" % (Time.now-@start_time)
+      puts "==> Summary (#{@completed.size} workers in %.4fs)" % (@duration)
       puts
 
       @completed.each do |worker|

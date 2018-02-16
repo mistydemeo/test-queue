@@ -114,6 +114,7 @@ module TestQueue
         "completed" => [],
       }
 
+      results["duration"] = Time.now - @start_time
       @completed.each do |worker|
         estatus += (worker.status.exitstatus || 1)
         results["completed"] << worker
