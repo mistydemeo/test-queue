@@ -1,6 +1,7 @@
 require 'set'
 require 'fileutils'
 require 'securerandom'
+require 'yaml'
 require 'test_queue/stats'
 require 'test_queue/test_framework'
 
@@ -108,60 +109,27 @@ module TestQueue
     end
 
     def summarize_internal
-      puts
-      puts "==> Summary (#{@completed.size} workers in %.4fs)" % (Time.now-@start_time)
-      puts
-
       estatus = 0
-      misrun_suites = []
-      unassigned_suites = []
-      @failures = ''
+      results = {
+        "completed" => [],
+      }
+
       @completed.each do |worker|
         estatus += (worker.status.exitstatus || 1)
+        results["completed"] << worker
         @stats.record_suites(worker.suites)
-        worker.suites.each do |suite|
-          assignment = @assignments.delete([suite.name, suite.path])
-          host = worker.host || Socket.gethostname
-          if assignment.nil?
-            unassigned_suites << [suite.name, suite.path]
-          elsif assignment != [host, worker.pid]
-            misrun_suites << [suite.name, suite.path] + assignment + [host, worker.pid]
-          end
-          @discovered_suites.delete([suite.name, suite.path])
-        end
 
         summarize_worker(worker)
-
-        @failures << worker.failure_output if worker.failure_output
-
-        puts "    [%2d] %60s      %4d suites in %.4fs      (%s %s)" % [
-          worker.num,
-          worker.summary,
-          worker.suites.size,
-          worker.end_time - worker.start_time,
-          worker.status.to_s,
-          worker.host && " on #{worker.host.split('.').first}"
-        ]
       end
 
-      unless @failures.empty?
-        puts
-        puts "==> Failures"
-        puts
-        puts @failures
+      File.open("results.yml", "w") do |f|
+        f.puts results.to_yaml
       end
-
-      puts
 
       @stats.save
 
-      summarize
-
       estatus = @completed.inject(0){ |s, worker| s + (worker.status.exitstatus || 1)}
       [estatus, 255].min
-    end
-
-    def summarize
     end
 
     def stats_file
