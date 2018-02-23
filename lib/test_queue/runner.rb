@@ -7,14 +7,15 @@ require 'test_queue/test_framework'
 
 module TestQueue
   class Worker
-    attr_accessor :status, :output, :num, :host
+    attr_accessor :pid, :status, :output, :num, :host
     attr_accessor :start_time, :end_time
     attr_accessor :summary, :failure_output
 
     # Array of TestQueue::Stats::Suite recording all the suites this worker ran.
     attr_reader :suites
 
-    def initialize(num)
+    def initialize(pid, num)
+      @pid = pid
       @num = num
       @start_time = Time.now
       @output = ''
@@ -163,7 +164,7 @@ module TestQueue
           Kernel.exit! ret
         end
 
-        @workers[pid] = Worker.new(num)
+        @workers[pid] = Worker.new(pid, num)
       end
     end
 
