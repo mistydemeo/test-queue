@@ -12,7 +12,7 @@ module TestQueue
       @filter = filter
       @failures = 0
       @early_failure_limit = early_failure_limit
-      @suites = suites
+      @loaded_suites = suites
     end
 
     def each
