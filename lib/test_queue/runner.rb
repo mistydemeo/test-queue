@@ -147,7 +147,11 @@ module TestQueue
     end
 
     def distribute_queue
-      queues = @queue.each_slice(@queue.length / @concurrency).to_a
+      if @queue.length > 0
+        queues = @queue.each_slice(@queue.length / @concurrency).to_a
+      else
+        queues = @concurrency.times.map { [] }
+      end
       @concurrency.times do |i|
         num = i+1
 
