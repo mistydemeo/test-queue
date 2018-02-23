@@ -244,7 +244,6 @@ module TestQueue
         worker.end_time = Time.now
 
         collect_worker_data(worker)
-        relay_to_master(worker) if relay?
         worker_completed(worker)
 
         true
