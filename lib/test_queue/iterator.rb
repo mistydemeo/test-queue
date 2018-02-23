@@ -37,7 +37,6 @@ module TestQueue
         end
         @suite_stats << TestQueue::Stats::Suite.new(suite_name, path, Time.now - start, Time.now)
         @failures += suite.failure_count if suite.respond_to? :failure_count
-        end
       end
     rescue Errno::ENOENT, Errno::ECONNRESET, Errno::ECONNREFUSED
     ensure
