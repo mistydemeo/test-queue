@@ -65,6 +65,7 @@ module TestQueue
 
       @awaited_suites = Set.new(@whitelist)
       @original_queue = Set.new(@queue).freeze
+      @loaded_queue = []
 
       @workers = {}
       @completed = []
@@ -142,14 +143,21 @@ module TestQueue
     def execute_internal
       prepare(@concurrency)
       @prepared_time = Time.now
+      load_queue
       distribute_queue
     ensure
       kill_subprocesses
     end
 
+    def load_queue
+      @queue.flat_map do |_, suite_file|
+        @test_framework.suites_from_file(suite_file).flat_map { |_, suites| suites}
+      end
+    end
+
     def distribute_queue
-      if @queue.length > 0
-        queues = @queue.each_slice(@queue.length / @concurrency).to_a
+      if @loaded_queue.length > 0
+        queues = @loaded_queue.each_slice(@loaded_queue.length / @concurrency).to_a
       else
         queues = @concurrency.times.map { [] }
       end
