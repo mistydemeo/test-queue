@@ -150,7 +150,7 @@ module TestQueue
     end
 
     def load_queue
-      @queue.flat_map do |_, suite_file|
+      @loaded_queue = @queue.flat_map do |suite_file|
         @test_framework.suites_from_file(suite_file).flat_map { |_, suites| suites}
       end
     end
