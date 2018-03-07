@@ -52,9 +52,9 @@ module TestQueue
                    end
       @whitelist.freeze
 
-      all_files = @test_framework.all_suite_files.to_set
+      @all_files = @test_framework.all_suite_files.to_set
       @queue = @stats.all_suites
-        .select { |suite| all_files.include?(suite.path) }
+        .select { |suite| @all_files.include?(suite.path) }
         .sort_by { |suite| -suite.duration }
         .map { |suite| [suite.name, suite.path] }
 
@@ -150,7 +150,7 @@ module TestQueue
     end
 
     def load_queue
-      @loaded_queue = @queue.flat_map do |suite_file|
+      @loaded_queue = @all_files.flat_map do |suite_file|
         @test_framework.suites_from_file(suite_file).flat_map { |_, suites| suites}
       end
     end
