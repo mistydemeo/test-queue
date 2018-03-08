@@ -20,7 +20,7 @@ module TestQueue
 
       procline = $0
 
-      @loaded_suites.each do |_, suite|
+      @loaded_suites.each do |suite|
         # If we've hit too many failures in one worker, assume the entire
         # test suite is broken, and notify master so the run
         # can be immediately halted.
